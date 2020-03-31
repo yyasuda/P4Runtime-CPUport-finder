@@ -1,0 +1,7 @@
+packet {
+  payload: "\377\377\377\377\377\377\377\377\377\377\377\377\000\000ABCDEFGHIJKLMN"
+  metadata {
+    metadata_id: 1
+    value: "\000\001"
+  }
+}
