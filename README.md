@@ -65,13 +65,13 @@ At this point, the tcpdump command will wait in this state.
 ### Step 2. Starting P4Runtime Shell
 
 ```bash
-Cecil(133)% docker run -it -v /tmp/ether_switch/:/tmp/ yutakayasuda/p4runtime-shell-dev /bin/bash
+Cecil(133)% docker run -it -v /tmp/:/tmp/ yutakayasuda/p4runtime-shell-dev /bin/bash
 root@d633c64bbb3c:/p4runtime-sh# . activate 
 (venv) root@d633c64bbb3c:/p4runtime-sh# 
 
 (venv) root@d633c64bbb3c:/p4runtime-sh# cd /tmp
-(venv) root@d633c64bbb3c:/tmp# ls
-ether_switch.json  ether_switch.p4  ether_switch.p4i  p4info.txt
+(venv) root@d633c64bbb3c:/tmp# ls p4info.txt cpuport_finder.json packetout.txt 
+cpuport_finder.json  p4info.txt  packetout.txt
 (venv) root@d633c64bbb3c:/tmp# 
 ```
 It synchronizes the/tmp/ether_switch directory on the host with the /tmp directory on the docker and places the switch-related files in this repository.
@@ -81,7 +81,7 @@ If you are using a different switch or P4 runtime environment, such as the Wedge
 Then connect to Mininet as follows. Adjust the IP address to your environment.
 
 ```bash
-(venv) root@d633c64bbb3c:/tmp# /p4runtime-sh/p4runtime-sh --grpc-addr 192.168.XX.XX:50001 --device-id 1 --election-id 0,1 --config p4info.txt,ether_switch.json
+(venv) root@d633c64bbb3c:/tmp# /p4runtime-sh/p4runtime-sh --grpc-addr 192.168.XX.XX:50001 --device-id 1 --election-id 0,1 --config p4info.txt,cpuport_finder.json
 *** Welcome to the IPython shell for P4Runtime ***
 P4Runtime sh >>>
 ```

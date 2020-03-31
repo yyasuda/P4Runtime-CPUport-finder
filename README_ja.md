@@ -63,13 +63,13 @@ listening on h1-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 ### Step 2. P4Runtime Shellの起動
 
 ```bash
-Cecil(133)% docker run -it -v /tmp/ether_switch/:/tmp/ yutakayasuda/p4runtime-shell-dev /bin/bash
+Cecil(133)% docker run -it -v /tmp/:/tmp/ yutakayasuda/p4runtime-shell-dev /bin/bash
 root@d633c64bbb3c:/p4runtime-sh# . activate 
 (venv) root@d633c64bbb3c:/p4runtime-sh# 
 
 (venv) root@d633c64bbb3c:/p4runtime-sh# cd /tmp
-(venv) root@d633c64bbb3c:/tmp# ls
-ether_switch.json  ether_switch.p4  ether_switch.p4i  p4info.txt
+(venv) root@d633c64bbb3c:/tmp# ls p4info.txt cpuport_finder.json packetout.txt 
+cpuport_finder.json  p4info.txt  packetout.txt
 (venv) root@d633c64bbb3c:/tmp# 
 ```
 ホストの /tmp/ether_switch ディレクトリと docker の /tmp を同期させて、そこにこのリポジトリにあるスイッチ関連ファイルを置いています。
@@ -79,7 +79,7 @@ ether_switch.json  ether_switch.p4  ether_switch.p4i  p4info.txt
 続いて、以下のようにして Mininet に接続します。IPアドレスは自身の環境に合わせて下さい。
 
 ```bash
-(venv) root@d633c64bbb3c:/tmp# /p4runtime-sh/p4runtime-sh --grpc-addr 192.168.XX.XX:50001 --device-id 1 --election-id 0,1 --config p4info.txt,ether_switch.json
+(venv) root@d633c64bbb3c:/tmp# /p4runtime-sh/p4runtime-sh --grpc-addr 192.168.XX.XX:50001 --device-id 1 --election-id 0,1 --config p4info.txt,cpuport_finder.json
 *** Welcome to the IPython shell for P4Runtime ***
 P4Runtime sh >>>
 ```
