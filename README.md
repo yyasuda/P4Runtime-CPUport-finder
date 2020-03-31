@@ -7,7 +7,7 @@ See [Japanese document](README_ja.md).
 
 This little P4 switch program is intended to clarify the CPU port number of the switch you are using with the P4 Runtime.
 
-For example, the common [P4 Runtime-enabled Mininet Docker Image] (simple_switch_grpc switch running under https://hub.docker.com/r/opennetworking/p4mn) uses 255 for the CPU port because it happens to pass the `--cpu-port 255` option at boot time. The default CPU port for simple_switch_grpc is 511, but it is [Set to 255 because it conflicts with the drop port](https://github.com/p4lang/behavioral-model/issues/831).
+For example, the common simple_switch_grpc switch running under [P4 Runtime-enabled Mininet Docker Image](https://hub.docker.com/r/opennetworking/p4mn) uses 255 for the CPU port because it happens to pass the `--cpu-port 255` option at boot time. The default CPU port for simple_switch_grpc is 511, but it is [Set to 255 because it conflicts with the drop port](https://github.com/p4lang/behavioral-model/issues/831).
 
 Wedge 100BF-65X and 100BF-32X switches with Tofino chip have different CPU port numbers. Even if you read the material, the explanation about the CPU port is scattered, and it is best to ask the switch to determine what number is used for this switch.
 
