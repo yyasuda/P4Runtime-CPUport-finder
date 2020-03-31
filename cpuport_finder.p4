@@ -40,8 +40,9 @@ control MyIngress(inout headers hdr, inout metadata meta,
 {
     apply {
       standard_metadata.egress_spec = hdr.packet_out.egress_port;
-      hdr.packet_in.setValid();
+      hdr.packet_out.setInvalid();
       hdr.packet_in.ingress_port = standard_metadata.ingress_port;
+      hdr.packet_in.setValid();
     }
 }
 
@@ -59,6 +60,7 @@ control MyComputeChecksum(inout headers  hdr, inout metadata meta)
 control MyDeparser(packet_out packet, in headers hdr)
 {
     apply {
+        packet.emit(hdr.packet_out);
         packet.emit(hdr.packet_in);
     }
 }
