@@ -1,7 +1,7 @@
 # P4Runtime-CPUport-finder
 Simple tool to identify the CPU port number on P4Runtime
 
-See [Japanese document](docs_ja/README.md).
+See [Japanese document](README_ja.md).
 
 ### Introduction
 
