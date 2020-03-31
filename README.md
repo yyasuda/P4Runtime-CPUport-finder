@@ -117,6 +117,6 @@ In this state, the result of tcpdump that you ran in Step 1 should look like thi
 
 The first byte is 7f means 0111-1111, and the second byte is 80 means 1000-0000. If we extract only 9 bits from the most significant bit (left side), we see 0111-1111-1, which is ff in hexadecimal and 255 in decimal.
 
-In the Wedge 100BF-32X that I use, I have confirmed that it is 192 correctly.
+In the Wedge 100BF-32X running on Barefoot SDE 8.0.2 that I use, I have confirmed that it is 192 correctly.
 
 
