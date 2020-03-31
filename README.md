@@ -17,7 +17,7 @@ Here are the steps:
 
 ### Step 1. Preparing the switch (starting the Mininet environment)
 
-We will use [P4 Runtime-enabled Mininet Docker Image] (https://hub.docker.com/r/opennetworking/p4mn) as our switch. Here's how to get started.
+We will use [P4 Runtime-enabled Mininet Docker Image](https://hub.docker.com/r/opennetworking/p4mn) as our switch. Here's how to get started.
 
 Start the Mininet environment that supports P4Runtime in the Docker environment. Note that the --arp and --mac options are specified at startup so that ping tests can be performed without ARP processing.
 
