@@ -74,7 +74,7 @@ root@d633c64bbb3c:/p4runtime-sh# . activate
 cpuport_finder.json  p4info.txt  packetout.txt
 (venv) root@d633c64bbb3c:/tmp# 
 ```
-It synchronizes the/tmp/ether_switch directory on the host with the /tmp directory on the docker and places the switch-related files in this repository.
+It synchronizes the/tmp directory on the host with the /tmp directory on the docker and places the switch-related files in this repository.
 
 If you are using a different switch or P4 runtime environment, such as the Wedge 100BF-32X, please recompile cpuport_finder.p4 for your environment.
 

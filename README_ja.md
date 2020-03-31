@@ -72,7 +72,7 @@ root@d633c64bbb3c:/p4runtime-sh# . activate
 cpuport_finder.json  p4info.txt  packetout.txt
 (venv) root@d633c64bbb3c:/tmp# 
 ```
-ホストの /tmp/ether_switch ディレクトリと docker の /tmp を同期させて、そこにこのリポジトリにあるスイッチ関連ファイルを置いています。
+ホストの /tmp ディレクトリと docker の /tmp を同期させて、そこにこのリポジトリにあるスイッチ関連ファイルを置いています。
 
 もしあなたが Wedge 100BF-32X など、異なるスイッチや P4 実行環境を使っている場合は、cpuport_finder.p4 を自分の環境に合わせてコンパイルし直してください。
 
