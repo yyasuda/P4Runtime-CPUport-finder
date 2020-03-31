@@ -118,7 +118,3 @@ P4Runtime sh >>>
 
 
 
-
-
-Yutaka Yasuda, Kyoto Sangyo University
-
