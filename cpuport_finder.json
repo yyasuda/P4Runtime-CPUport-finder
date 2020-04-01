@@ -29,8 +29,25 @@
       ]
     },
     {
-      "name" : "packet_out_header_t",
+      "name" : "ethernet_t",
       "id" : 2,
+      "fields" : [
+        ["dstAddr", 48, false],
+        ["srcAddr", 48, false],
+        ["etherType", 16, false]
+      ]
+    },
+    {
+      "name" : "cpuport_header_t",
+      "id" : 3,
+      "fields" : [
+        ["port", 9, false],
+        ["_pad", 7, false]
+      ]
+    },
+    {
+      "name" : "packet_out_header_t",
+      "id" : 4,
       "fields" : [
         ["egress_port", 9, false],
         ["_pad", 7, false]
@@ -38,7 +55,7 @@
     },
     {
       "name" : "packet_in_header_t",
-      "id" : 3,
+      "id" : 5,
       "fields" : [
         ["ingress_port", 9, false],
         ["_pad", 7, false]
@@ -61,15 +78,29 @@
       "pi_omit" : true
     },
     {
-      "name" : "packet_out",
+      "name" : "ethernet",
       "id" : 2,
+      "header_type" : "ethernet_t",
+      "metadata" : false,
+      "pi_omit" : true
+    },
+    {
+      "name" : "cpuport",
+      "id" : 3,
+      "header_type" : "cpuport_header_t",
+      "metadata" : false,
+      "pi_omit" : true
+    },
+    {
+      "name" : "packet_out",
+      "id" : 4,
       "header_type" : "packet_out_header_t",
       "metadata" : false,
       "pi_omit" : true
     },
     {
       "name" : "packet_in",
-      "id" : 3,
+      "id" : 5,
       "header_type" : "packet_in_header_t",
       "metadata" : false,
       "pi_omit" : true
@@ -108,6 +139,15 @@
                 }
               ],
               "op" : "extract"
+            },
+            {
+              "parameters" : [
+                {
+                  "type" : "regular",
+                  "value" : "ethernet"
+                }
+              ],
+              "op" : "extract"
             }
           ],
           "transitions" : [
@@ -128,12 +168,12 @@
       "name" : "deparser",
       "id" : 0,
       "source_info" : {
-        "filename" : "cpuport_finder.p4",
-        "line" : 59,
+        "filename" : "/tmp/cpuport_finder.p4",
+        "line" : 80,
         "column" : 8,
         "source_fragment" : "MyDeparser"
       },
-      "order" : ["packet_in"],
+      "order" : ["packet_out", "packet_in", "ethernet", "cpuport"],
       "primitives" : []
     }
   ],
@@ -144,7 +184,7 @@
   "learn_lists" : [],
   "actions" : [
     {
-      "name" : "cpuport_finder42",
+      "name" : "cpuport_finder62",
       "id" : 0,
       "runtime_data" : [],
       "primitives" : [
@@ -161,25 +201,25 @@
             }
           ],
           "source_info" : {
-            "filename" : "cpuport_finder.p4",
-            "line" : 42,
+            "filename" : "/tmp/cpuport_finder.p4",
+            "line" : 62,
             "column" : 6,
             "source_fragment" : "standard_metadata.egress_spec = hdr.packet_out.egress_port"
           }
         },
         {
-          "op" : "add_header",
+          "op" : "remove_header",
           "parameters" : [
             {
               "type" : "header",
-              "value" : "packet_in"
+              "value" : "packet_out"
             }
           ],
           "source_info" : {
-            "filename" : "cpuport_finder.p4",
-            "line" : 43,
+            "filename" : "/tmp/cpuport_finder.p4",
+            "line" : 63,
             "column" : 6,
-            "source_fragment" : "hdr.packet_in.setValid()"
+            "source_fragment" : "hdr.packet_out.setInvalid()"
           }
         },
         {
@@ -187,7 +227,7 @@
           "parameters" : [
             {
               "type" : "field",
-              "value" : ["packet_in", "ingress_port"]
+              "value" : ["cpuport", "port"]
             },
             {
               "type" : "field",
@@ -195,10 +235,25 @@
             }
           ],
           "source_info" : {
-            "filename" : "cpuport_finder.p4",
-            "line" : 44,
+            "filename" : "/tmp/cpuport_finder.p4",
+            "line" : 64,
             "column" : 6,
-            "source_fragment" : "hdr.packet_in.ingress_port = standard_metadata.ingress_port"
+            "source_fragment" : "hdr.cpuport.port = standard_metadata.ingress_port"
+          }
+        },
+        {
+          "op" : "add_header",
+          "parameters" : [
+            {
+              "type" : "header",
+              "value" : "cpuport"
+            }
+          ],
+          "source_info" : {
+            "filename" : "/tmp/cpuport_finder.p4",
+            "line" : 65,
+            "column" : 6,
+            "source_fragment" : "hdr.cpuport.setValid()"
           }
         }
       ]
@@ -209,19 +264,19 @@
       "name" : "ingress",
       "id" : 0,
       "source_info" : {
-        "filename" : "cpuport_finder.p4",
-        "line" : 38,
+        "filename" : "/tmp/cpuport_finder.p4",
+        "line" : 58,
         "column" : 8,
         "source_fragment" : "MyIngress"
       },
-      "init_table" : "tbl_cpuport_finder42",
+      "init_table" : "tbl_cpuport_finder62",
       "tables" : [
         {
-          "name" : "tbl_cpuport_finder42",
+          "name" : "tbl_cpuport_finder62",
           "id" : 0,
           "source_info" : {
-            "filename" : "cpuport_finder.p4",
-            "line" : 42,
+            "filename" : "/tmp/cpuport_finder.p4",
+            "line" : 62,
             "column" : 36,
             "source_fragment" : "= hdr.packet_out.egress_port; ..."
           },
@@ -233,10 +288,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [0],
-          "actions" : ["cpuport_finder42"],
+          "actions" : ["cpuport_finder62"],
           "base_default_next" : null,
           "next_tables" : {
-            "cpuport_finder42" : null
+            "cpuport_finder62" : null
           },
           "default_entry" : {
             "action_id" : 0,
@@ -253,8 +308,8 @@
       "name" : "egress",
       "id" : 1,
       "source_info" : {
-        "filename" : "cpuport_finder.p4",
-        "line" : 48,
+        "filename" : "/tmp/cpuport_finder.p4",
+        "line" : 69,
         "column" : 8,
         "source_fragment" : "MyEgress"
       },

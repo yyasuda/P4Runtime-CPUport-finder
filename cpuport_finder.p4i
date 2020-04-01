@@ -1,6 +1,6 @@
-# 1 "cpuport_finder.p4"
+# 1 "/tmp/cpuport_finder.p4"
 # 1 "<built-in>" 1
-# 1 "cpuport_finder.p4" 2
+# 1 "/tmp/cpuport_finder.p4" 2
 # 1 "/usr/local/share/p4c/p4include/core.p4" 1
 /*
 Copyright 2013-present Barefoot Networks, Inc.
@@ -83,7 +83,7 @@ match_kind {
     /// Longest-prefix match.
     lpm
 }
-# 2 "cpuport_finder.p4" 2
+# 2 "/tmp/cpuport_finder.p4" 2
 # 1 "/usr/local/share/p4c/p4include/v1model.p4" 1
 /*
 Copyright 2013-present Barefoot Networks, Inc.
@@ -790,7 +790,9 @@ package V1Switch<H, M>(Parser<H, M> p,
                        ComputeChecksum<H, M> ck,
                        Deparser<H> dep
                        );
-# 3 "cpuport_finder.p4" 2
+# 3 "/tmp/cpuport_finder.p4" 2
+
+typedef bit<48> macAddr_t;
 
 @controller_header("packet_out")
 header packet_out_header_t {
@@ -804,11 +806,24 @@ header packet_in_header_t {
     bit<7> _pad;
 }
 
+header ethernet_t {
+    macAddr_t dstAddr;
+    macAddr_t srcAddr;
+    bit<16> etherType;
+}
+
+header cpuport_header_t {
+    bit<9> port;
+    bit<7> _pad;
+}
+
 struct metadata {
     /* empty */
 }
 
 struct headers {
+    ethernet_t ethernet;
+    cpuport_header_t cpuport;
     packet_out_header_t packet_out;
     packet_in_header_t packet_in;
 }
@@ -818,6 +833,11 @@ parser MyParser(packet_in packet, out headers hdr, inout metadata meta,
 {
     state start {
         packet.extract(hdr.packet_out);
+        transition parse_ethernet;
+    }
+
+    state parse_ethernet {
+        packet.extract(hdr.ethernet);
         transition accept;
     }
 }
@@ -831,8 +851,9 @@ control MyIngress(inout headers hdr, inout metadata meta,
 {
     apply {
       standard_metadata.egress_spec = hdr.packet_out.egress_port;
-      hdr.packet_in.setValid();
-      hdr.packet_in.ingress_port = standard_metadata.ingress_port;
+      hdr.packet_out.setInvalid();
+      hdr.cpuport.port = standard_metadata.ingress_port;
+      hdr.cpuport.setValid();
     }
 }
 
@@ -850,7 +871,10 @@ control MyComputeChecksum(inout headers hdr, inout metadata meta)
 control MyDeparser(packet_out packet, in headers hdr)
 {
     apply {
+        packet.emit(hdr.packet_out);
         packet.emit(hdr.packet_in);
+        packet.emit(hdr.ethernet);
+        packet.emit(hdr.cpuport);
     }
 }
 
