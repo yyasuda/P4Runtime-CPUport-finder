@@ -1,0 +1,7 @@
+packet {
+  payload: "\xff\xff\xff\xff\xff\xff\x00\x01\x00\x01\x00\x01\x88\xb5\x00\x0001234567890123456789012345678901234567890123456789012345678901234567890123456789"
+  metadata {
+    metadata_id: 1
+    value: "\x00\x84"
+  }
+}
