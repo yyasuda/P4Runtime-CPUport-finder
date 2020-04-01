@@ -68,8 +68,8 @@ root@d633c64bbb3c:/p4runtime-sh# . activate
 (venv) root@d633c64bbb3c:/p4runtime-sh# 
 
 (venv) root@d633c64bbb3c:/p4runtime-sh# cd /tmp
-(venv) root@d633c64bbb3c:/tmp# ls p4info.txt cpuport_finder.json packetout.txt 
-cpuport_finder.json  p4info.txt  packetout.txt
+(venv) root@d633c64bbb3c:/tmp# ls
+cpuport_finder.json  p4info.txt  pout_exp_1.txt
 (venv) root@d633c64bbb3c:/tmp# 
 ```
 ホストの /tmp ディレクトリと docker の /tmp を同期させて、そこにこのリポジトリにあるスイッチ関連ファイルを置いています。
@@ -90,31 +90,54 @@ P4Runtime Shell 側で Request() 関数を起動します。Request() 関数は�
 特に戻り値やメッセージは返ってきません。画面上には送信するメッセージの内容がprintされます。
 
 ```bash
-P4Runtime sh >>> Request("/tmp/packetout.txt")                                                                                             
+P4Runtime sh >>> Request("/tmp/pout_exp_1.txt")                                                                                                 
 packet {
-  payload: "\377\377\377\377\377\377\377\377\377\377\377\377\000\000ABCDEFGHIJKLMN"
+  payload: "\377\377\377\377\377\377\000\001\000\001\000\001\210\265\000\00001234567890123456789012345678901234567890123456789012345678901234567890123456789"
   metadata {
     metadata_id: 1
     value: "\000\001"
   }
 }
-P4Runtime sh >>> 
+P4Runtime sh >>>
 ```
 
 読み込ませるファイルの中の value: の値が Packet-Out する出力先ポート番号です。ここでは port 1 に出力させています。この部分をあなたにとって都合の良いスイッチ番号に切り替えて使ってください。
+
+ペイロード部分、つまり Packet-Out しようとするパケットの中身は以下のようなものです。
+
+```pseucode
+dest: ff:ff:ff:ff:ff:ff 
+src : 00:01:00:01:00:01
+type: 88b5 (IEEE Local experimental)
+body: NULL, NULL, "0123.... (80bytes)"
+```
 
 ### Step 4. 出力パケットの検出
 
 この状態で、Step 1. で実行していた tcpdump の結果に、以下のような表示が出ているでしょう。
 ```bash
-09:41:30.049074 Broadcast > 7f:80:ff:ff:ff:ff (oui Unknown), ethertype Unknown (0xffff), length 30: 
-	0x0000:  7f80 ffff ffff ffff ffff ffff ffff 0000  ................
-	0x0010:  4142 4344 4546 4748 494a 4b4c 4d4e       ABCDEFGHIJKLMN
+09:16:34.625856 00:01:00:01:00:01 (oui Unknown) > Broadcast, ethertype Unknown (0x88b5), length 98:
+        0x0000:  ffff ffff ffff 0001 0001 0001 88b5 7f80  ................
+        0x0010:  0000 3031 3233 3435 3637 3839 3031 3233  ..01234567890123
+        0x0020:  3435 3637 3839 3031 3233 3435 3637 3839  4567890123456789
+        0x0030:  3031 3233 3435 3637 3839 3031 3233 3435  0123456789012345
+        0x0040:  3637 3839 3031 3233 3435 3637 3839 3031  6789012345678901
+        0x0050:  3233 3435 3637 3839 3031 3233 3435 3637  2345678901234567
+        0x0060:  3839                                     89
 ```
 
-先頭 1 バイト目が 7f つまり 0111-1111、2 バイト目が 80 つまり 1000-0000 です。最上位ビット（左側）から 9 bit だけ取り出すと、0111-1111-1 つまり16 進数で ff、10 進数では 255 であることが分かります。
+受信されたパケットは上で説明した Packet-Out するはずだったものとほぼ同じです。違いは14バイトの Ethernet Header (dest, src, type) の後に続く、15, 16 バイトが追加されていることです。17バイトめからはbody がそのまま出力されています。この15, 16 バイトめに挿入された 2 バイトのフォーマットは、cpuport_finder.p4 のcpuport_header_t で定義されています。 
 
-筆者が使用している Wedge 100BF-32X (Barefoot SDE 8.9.2) では、正しく 192 になることを確認しています。
+```C++
+header cpuport_header_t {
+    bit<9> port;
+    bit<7> _pad;
+}
+```
+
+追加された2バイトは 0x7f80 です。先頭 1 バイト目の 7f とは 0111-1111、2 バイト目の 80 は 1000-0000 です。最上位ビット（左側）から 9 bit だけ取り出すと、0111-1111-1 つまり16 進数で ff、10 進数では 255 であることが分かります。
+
+私が使用している Wedge 100BF-32X (Barefoot SDE 8.9.2) で同じ操作をすると、この2バイトは x6000 となりました。x6000 を先頭9ビットで切り落とすと、この環境での正しいCPU port の番号、192 と一致することを確認しています。
 
 
 

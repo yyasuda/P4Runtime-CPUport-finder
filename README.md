@@ -70,8 +70,8 @@ root@d633c64bbb3c:/p4runtime-sh# . activate
 (venv) root@d633c64bbb3c:/p4runtime-sh# 
 
 (venv) root@d633c64bbb3c:/p4runtime-sh# cd /tmp
-(venv) root@d633c64bbb3c:/tmp# ls p4info.txt cpuport_finder.json packetout.txt 
-cpuport_finder.json  p4info.txt  packetout.txt
+(venv) root@d633c64bbb3c:/tmp# ls 
+cpuport_finder.json  p4info.txt  pout_exp_1.txt
 (venv) root@d633c64bbb3c:/tmp# 
 ```
 It synchronizes the/tmp directory on the host with the /tmp directory on the docker and places the switch-related files in this repository.
@@ -93,30 +93,50 @@ Do the Request() function on the P4 Runtime Shell side. The Request() function i
 No return value or message is returned. The contents of the message to be sent are printed on the screen.
 
 ```bash
-P4Runtime sh >>> Request("/tmp/packetout.txt")                                                                                             
+P4Runtime sh >>> Request("pout_exp_1.txt")
 packet {
-  payload: "\377\377\377\377\377\377\377\377\377\377\377\377\000\000ABCDEFGHIJKLMN"
+  payload: "\377\377\377\377\377\377\000\001\000\001\000\001\210\265\000\00001234567890123456789012345678901234567890123456789012345678901234567890123456789"
   metadata {
     metadata_id: 1
     value: "\000\001"
   }
 }
-P4Runtime sh >>> 
+P4Runtime sh >>>
 ```
 
 The value: in the file to be read is the output port number to Packet-Out. In this case, port 1 is specified. Please change this part to a switch number that is convenient for you.
+
+The payload part, that is, the contents of the packet to be Packet-Out, is as follows.
+
+```pseucode
+dest: ff:ff:ff:ff:ff:ff 
+src : 00:01:00:01:00:01
+type: 88b5 (IEEE Local experimental)
+body: NULL, NULL, "0123.... (80bytes)"
+```
 
 ### Step 4. Output packet detection
 
 In this state, the result of tcpdump that you ran in Step 1 should look like this:
 ```bash
-09:41:30.049074 Broadcast > 7f:80:ff:ff:ff:ff (oui Unknown), ethertype Unknown (0xffff), length 30: 
-	0x0000:  7f80 ffff ffff ffff ffff ffff ffff 0000  ................
-	0x0010:  4142 4344 4546 4748 494a 4b4c 4d4e       ABCDEFGHIJKLMN
+09:16:34.625856 00:01:00:01:00:01 (oui Unknown) > Broadcast, ethertype Unknown (0x88b5), length 98:
+        0x0000:  ffff ffff ffff 0001 0001 0001 88b5 7f80  ................
+        0x0010:  0000 3031 3233 3435 3637 3839 3031 3233  ..01234567890123
+        0x0020:  3435 3637 3839 3031 3233 3435 3637 3839  4567890123456789
+        0x0030:  3031 3233 3435 3637 3839 3031 3233 3435  0123456789012345
+        0x0040:  3637 3839 3031 3233 3435 3637 3839 3031  6789012345678901
+        0x0050:  3233 3435 3637 3839 3031 3233 3435 3637  2345678901234567
+        0x0060:  3839                                     89
 ```
 
-The first byte is 7f means 0111-1111, and the second byte is 80 means 1000-0000. If we extract only 9 bits from the most significant bit (left side), we see 0111-1111-1, which is ff in hexadecimal and 255 in decimal.
+The received packet is almost the same as what should have been Packet-Out described above. The difference is that 15-16 bytes are inserted after the 14-bytes Ethernet Header (dest, src, type). The body is transmitted as it is from the 17th byte. The format of inserted 2 bytes at the 15-16 byte position is defined by cpuport_header_t in cpuport_finder.p4.
 
-In the Wedge 100BF-32X running on Barefoot SDE 8.9.2 that I use, I have confirmed that it is 192 correctly.
+```C++
+header cpuport_header_t {
+    bit<9> port;
+    bit<7> _pad;
+}
+```
+Added 2 bytes is 0x7f80. 7f in the first byte is 0111-1111, and 80 in the second byte is 1000-0000. If we extract only 9 bits from the most significant bit (left side), we see 0111-1111-1, which is ff in hexadecimal and 255 in decimal.
 
-
+When I did the same operation on my Wedge 100BF-32X (Barefoot SDE 8.9.2), these 2 bytes were x6000. When the x6000 is truncated at the first 9 bits, it is confirmed that it matches the correct CPU port number in this environment, 192.
