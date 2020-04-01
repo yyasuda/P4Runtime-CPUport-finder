@@ -168,7 +168,7 @@
       "name" : "deparser",
       "id" : 0,
       "source_info" : {
-        "filename" : "/tmp/cpuport_finder.p4",
+        "filename" : "cpuport_finder.p4",
         "line" : 80,
         "column" : 8,
         "source_fragment" : "MyDeparser"
@@ -201,7 +201,7 @@
             }
           ],
           "source_info" : {
-            "filename" : "/tmp/cpuport_finder.p4",
+            "filename" : "cpuport_finder.p4",
             "line" : 62,
             "column" : 6,
             "source_fragment" : "standard_metadata.egress_spec = hdr.packet_out.egress_port"
@@ -216,10 +216,25 @@
             }
           ],
           "source_info" : {
-            "filename" : "/tmp/cpuport_finder.p4",
+            "filename" : "cpuport_finder.p4",
             "line" : 63,
             "column" : 6,
             "source_fragment" : "hdr.packet_out.setInvalid()"
+          }
+        },
+        {
+          "op" : "add_header",
+          "parameters" : [
+            {
+              "type" : "header",
+              "value" : "cpuport"
+            }
+          ],
+          "source_info" : {
+            "filename" : "cpuport_finder.p4",
+            "line" : 64,
+            "column" : 6,
+            "source_fragment" : "hdr.cpuport.setValid()"
           }
         },
         {
@@ -235,25 +250,10 @@
             }
           ],
           "source_info" : {
-            "filename" : "/tmp/cpuport_finder.p4",
-            "line" : 64,
-            "column" : 6,
-            "source_fragment" : "hdr.cpuport.port = standard_metadata.ingress_port"
-          }
-        },
-        {
-          "op" : "add_header",
-          "parameters" : [
-            {
-              "type" : "header",
-              "value" : "cpuport"
-            }
-          ],
-          "source_info" : {
-            "filename" : "/tmp/cpuport_finder.p4",
+            "filename" : "cpuport_finder.p4",
             "line" : 65,
             "column" : 6,
-            "source_fragment" : "hdr.cpuport.setValid()"
+            "source_fragment" : "hdr.cpuport.port = standard_metadata.ingress_port"
           }
         }
       ]
@@ -264,7 +264,7 @@
       "name" : "ingress",
       "id" : 0,
       "source_info" : {
-        "filename" : "/tmp/cpuport_finder.p4",
+        "filename" : "cpuport_finder.p4",
         "line" : 58,
         "column" : 8,
         "source_fragment" : "MyIngress"
@@ -275,7 +275,7 @@
           "name" : "tbl_cpuport_finder62",
           "id" : 0,
           "source_info" : {
-            "filename" : "/tmp/cpuport_finder.p4",
+            "filename" : "cpuport_finder.p4",
             "line" : 62,
             "column" : 36,
             "source_fragment" : "= hdr.packet_out.egress_port; ..."
@@ -308,7 +308,7 @@
       "name" : "egress",
       "id" : 1,
       "source_info" : {
-        "filename" : "/tmp/cpuport_finder.p4",
+        "filename" : "cpuport_finder.p4",
         "line" : 69,
         "column" : 8,
         "source_fragment" : "MyEgress"

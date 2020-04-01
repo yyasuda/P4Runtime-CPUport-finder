@@ -61,8 +61,8 @@ control MyIngress(inout headers hdr, inout metadata meta,
     apply {
       standard_metadata.egress_spec = hdr.packet_out.egress_port;
       hdr.packet_out.setInvalid();
-      hdr.cpuport.port = standard_metadata.ingress_port;
       hdr.cpuport.setValid();
+      hdr.cpuport.port = standard_metadata.ingress_port;
     }
 }
 

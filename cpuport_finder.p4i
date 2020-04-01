@@ -1,6 +1,6 @@
-# 1 "/tmp/cpuport_finder.p4"
+# 1 "cpuport_finder.p4"
 # 1 "<built-in>" 1
-# 1 "/tmp/cpuport_finder.p4" 2
+# 1 "cpuport_finder.p4" 2
 # 1 "/usr/local/share/p4c/p4include/core.p4" 1
 /*
 Copyright 2013-present Barefoot Networks, Inc.
@@ -83,7 +83,7 @@ match_kind {
     /// Longest-prefix match.
     lpm
 }
-# 2 "/tmp/cpuport_finder.p4" 2
+# 2 "cpuport_finder.p4" 2
 # 1 "/usr/local/share/p4c/p4include/v1model.p4" 1
 /*
 Copyright 2013-present Barefoot Networks, Inc.
@@ -790,7 +790,7 @@ package V1Switch<H, M>(Parser<H, M> p,
                        ComputeChecksum<H, M> ck,
                        Deparser<H> dep
                        );
-# 3 "/tmp/cpuport_finder.p4" 2
+# 3 "cpuport_finder.p4" 2
 
 typedef bit<48> macAddr_t;
 
@@ -852,8 +852,8 @@ control MyIngress(inout headers hdr, inout metadata meta,
     apply {
       standard_metadata.egress_spec = hdr.packet_out.egress_port;
       hdr.packet_out.setInvalid();
-      hdr.cpuport.port = standard_metadata.ingress_port;
       hdr.cpuport.setValid();
+      hdr.cpuport.port = standard_metadata.ingress_port;
     }
 }
 
